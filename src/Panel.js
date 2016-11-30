@@ -1283,9 +1283,9 @@ define(function (require, exports) {
 
         // create context menu for git resolve conflict
         var resolveCmenu = Menus.registerContextMenu("git-panel-resolve-conflict-menu");
-        CommandManager.register("Use external merge tool", "git.openInMergetool", handleGitMergetool);
-        CommandManager.register("Use 'Ours'", "git.resolveUsingOurs", handleGitResolveUsingOurs);
-        CommandManager.register("Use 'Theirs'", "git.resolveUsingTheirs", handleGitResolveUsingTheirs);
+        CommandManager.register(Strings.OPEN_IN_MERGETOOL, "git.openInMergetool", handleGitMergetool);
+        CommandManager.register(Strings.RESOLVE_USING_OURS, "git.resolveUsingOurs", handleGitResolveUsingOurs);
+        CommandManager.register(Strings.RESOLVE_USING_THEIRS, "git.resolveUsingTheirs", handleGitResolveUsingTheirs);
         resolveCmenu.addMenuItem("git.openInMergetool");
         resolveCmenu.addMenuDivider();
         resolveCmenu.addMenuItem("git.resolveUsingOurs");
