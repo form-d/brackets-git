@@ -428,9 +428,9 @@ define(function (require, exports) {
         Git.mergetool(file);
     }
 
-    function handleGitResolveUsingMine() {
+    function handleGitResolveUsingOurs() {
         var file = $gitPanel.find("tr.selected").attr("x-file");
-        Git.resolveUsingMine(file);
+        Git.resolveUsingOurs(file);
     }
 
     function handleGitResolveUsingTheirs() {
@@ -1284,11 +1284,11 @@ define(function (require, exports) {
         // create context menu for git resolve conflict
         var resolveCmenu = Menus.registerContextMenu("git-panel-resolve-conflict-menu");
         CommandManager.register("Use external merge tool", "git.openInMergetool", handleGitMergetool);
-        CommandManager.register("Use 'Mine'", "git.resolveUsingMine", handleGitResolveUsingMine);
+        CommandManager.register("Use 'Ours'", "git.resolveUsingOurs", handleGitResolveUsingOurs);
         CommandManager.register("Use 'Theirs'", "git.resolveUsingTheirs", handleGitResolveUsingTheirs);
         resolveCmenu.addMenuItem("git.openInMergetool");
         resolveCmenu.addMenuDivider();
-        resolveCmenu.addMenuItem("git.resolveUsingMine");
+        resolveCmenu.addMenuItem("git.resolveUsingOurs");
         resolveCmenu.addMenuItem("git.resolveUsingTheirs");
 
     } // function init() {

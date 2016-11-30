@@ -879,7 +879,7 @@ define(function (require, exports) {
         });
     }
 
-    function resolveUsingMine(file) {
+    function resolveUsingOurs(file) {
         var args = ["checkout", "--ours", "--", file];
         return git(args).then(function () {
             stage(file);
@@ -1146,7 +1146,7 @@ define(function (require, exports) {
     exports.diffFileNice              = diffFileNice;
     exports.difftool                  = difftool;
     exports.mergetool                 = mergetool;
-    exports.resolveUsingMine          = resolveUsingMine;
+    exports.resolveUsingOurs          = resolveUsingOurs;
     exports.resolveUsingTheirs        = resolveUsingTheirs;
     exports.clean                     = clean;
     exports.getFilesFromCommit        = getFilesFromCommit;
