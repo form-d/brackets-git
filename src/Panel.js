@@ -423,6 +423,21 @@ define(function (require, exports) {
         }
     }
 
+    function handleGitMergetool() {
+        var file = $gitPanel.find("tr.selected").attr("x-file");
+        Git.mergetool(file);
+    }
+
+    function handleGitResolveUsingMine() {
+        var file = $gitPanel.find("tr.selected").attr("x-file");
+        Git.resolveUsingMine(file);
+    }
+
+    function handleGitResolveUsingTheirs() {
+        var file = $gitPanel.find("tr.selected").attr("x-file");
+        Git.resolveUsingTheirs(file);
+    }
+
     function handleGitTag(file) {
         // Open the Tag Dialog
         var compiledTemplate = Mustache.render(gitTagDialogTemplate, { file: file, Strings: Strings }),
@@ -781,13 +796,19 @@ define(function (require, exports) {
                 file.statusText = file.status.map(function (status) {
                     return Strings["FILE_" + status];
                 }).join(", ");
+                file.mergeStatus = Strings["FILE_UNMERGED_" + file.mergeConflicts];
+
                 file.allowDiff = file.status.indexOf(Git.FILE_STATUS.UNTRACKED) === -1 &&
-                                 file.status.indexOf(Git.FILE_STATUS.RENAMED) === -1 &&
-                                 file.status.indexOf(Git.FILE_STATUS.DELETED) === -1;
+                file.status.indexOf(Git.FILE_STATUS.RENAMED) === -1 &&
+                file.status.indexOf(Git.FILE_STATUS.DELETED) === -1 &&
+                file.status.indexOf(Git.FILE_STATUS.UNMERGED) === -1;
+
                 file.allowDelete = file.status.indexOf(Git.FILE_STATUS.UNTRACKED) !== -1 ||
-                                   file.status.indexOf(Git.FILE_STATUS.STAGED) !== -1 &&
-                                   file.status.indexOf(Git.FILE_STATUS.ADDED) !== -1;
+                file.status.indexOf(Git.FILE_STATUS.STAGED) !== -1 &&
+                file.status.indexOf(Git.FILE_STATUS.ADDED) !== -1;
+
                 file.allowUndo = !file.allowDelete;
+                file.allowResolve = file.status.indexOf(Git.FILE_STATUS.UNMERGED) !== -1;
             });
             $tableContainer.append(Mustache.render(gitPanelResultsTemplate, {
                 files: files,
@@ -1002,13 +1023,14 @@ define(function (require, exports) {
             })
             .on("click", ".modified-file", function (e) {
                 var $this = $(e.currentTarget);
-                if ($this.attr("x-status") === Git.FILE_STATUS.DELETED) {
-                    return;
-                }
-                CommandManager.execute(Commands.FILE_OPEN, {
-                    fullPath: Preferences.get("currentGitRoot") + $this.attr("x-file")
-                });
-            })
+            // check for selected class, so it does not trigger event to close all popups -> otherewise "git resolve dropdown" toggeling is prevented
+            if ($this.attr("x-status") === Git.FILE_STATUS.DELETED || $this.hasClass("selected")) {
+                return;
+            }
+            CommandManager.execute(Commands.FILE_OPEN, {
+                fullPath: Preferences.get("currentGitRoot") + $this.attr("x-file")
+            });
+        })
             .on("dblclick", ".modified-file", function (e) {
                 var $this = $(e.currentTarget);
                 if ($this.attr("x-status") === Git.FILE_STATUS.DELETED) {
@@ -1176,7 +1198,28 @@ define(function (require, exports) {
                 e.stopPropagation();
                 handleGitTag($(e.target).closest("tr").attr("x-file"));
             })
-            .on("click", ".reset-all", discardAllChanges);
+            .on("click", ".reset-all", discardAllChanges)
+            .on("click", ".btn-git-resolve", function (e) {
+
+            e.stopPropagation();
+
+            var buttonOffset,
+                buttonHeight;
+
+            //Menus.getContextMenu("git-panel-resolve-conflict-menu").open(e); does not work because it has no delegated events for dynamically added elements
+
+            // NOTE  CommandManager closes all Popups on event "beforeExecuteCommand"
+            if (Menus.getContextMenu("git-panel-resolve-conflict-menu").isOpen()) {
+                Menus.getContextMenu("git-panel-resolve-conflict-menu").close();
+            } else {
+                buttonOffset = $(this).offset();
+                buttonHeight = $(this).outerHeight() + 2;
+                Menus.getContextMenu("git-panel-resolve-conflict-menu").open({
+                    pageX: buttonOffset.left,
+                    pageY: buttonOffset.top + buttonHeight
+                });
+            }
+        });
 
         /* Put here event handlers for advanced actions
         if (Preferences.get("enableAdvancedFeatures")) {
@@ -1236,6 +1279,18 @@ define(function (require, exports) {
         if (Preferences.get("panelEnabled")) {
             toggle(true);
         }
+
+
+        // create context menu for git resolve conflict
+        var resolveCmenu = Menus.registerContextMenu("git-panel-resolve-conflict-menu");
+        CommandManager.register("Use external merge tool", "git.openInMergetool", handleGitMergetool);
+        CommandManager.register("Use 'Mine'", "git.resolveUsingMine", handleGitResolveUsingMine);
+        CommandManager.register("Use 'Theirs'", "git.resolveUsingTheirs", handleGitResolveUsingTheirs);
+        resolveCmenu.addMenuItem("git.openInMergetool");
+        resolveCmenu.addMenuDivider();
+        resolveCmenu.addMenuItem("git.resolveUsingMine");
+        resolveCmenu.addMenuItem("git.resolveUsingTheirs");
+
     } // function init() {
 
     function enable() {

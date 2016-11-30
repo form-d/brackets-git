@@ -140,6 +140,10 @@
     .git-edited-list td {
         vertical-align: middle;
     }
+    .git-edited-list .inspection-errors {
+        padding: 5px 11px;
+        background-position: 5px 4px;
+    }
     tr.selected {
         font-weight: 400;
     }
@@ -173,12 +177,18 @@
             }
         }
     }
-    .btn-git-diff, .btn-git-undo, .btn-git-delete {
+    .btn-git-diff, .btn-git-undo, .btn-git-delete, .btn-git-resolve {
         padding: 2px 5px;
         font-size: 12px;
         line-height: 1em;
         border-radius: 3px;
-        margin: 0 6px 0 0;
+        margin: 0 6px 1px 0;
+    }
+    .btn-git-resolve {
+        padding-right: 21px;
+    }
+    .btn-git-diff {
+        margin: 0 0 1px 0;
     }
     .nothing-to-commit {
         padding: 15px;

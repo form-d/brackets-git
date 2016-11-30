@@ -646,6 +646,28 @@ define(function (require, exports) {
         return /\\[0-9]{3}/.test(str);
     }
 
+    function _isUnmerged(statusStaged, statusUnstaged) {
+
+        switch (statusStaged + statusUnstaged) {
+            case "DD":
+                return "BOTH_DELETED";
+            case "AU":
+                return "ADDED_BY_US";
+            case "UD":
+                return "DELETED_BY_THEM";
+            case "UA":
+                return "ADDED_BY_THEM";
+            case "DU":
+                return "DELETED_BY_US";
+            case "AA":
+                return "BOTH_ADDED";
+            case "UU":
+                return "BOTH_MODIFIED";
+            default:
+                return false;
+        }
+    }
+
     function status(type) {
         return git(["status", "-u", "--porcelain"]).then(function (stdout) {
             if (!stdout) { return []; }
@@ -672,50 +694,54 @@ define(function (require, exports) {
                     }
                 }
 
+                var isUnmerged = _isUnmerged(statusStaged, statusUnstaged);
+
+                // Not sure if the reset is still needed by other functions, keep it meanwhile so deleting staged files doesn't fail (solution ->Git rm ?)
                 if (statusStaged !== " " && statusUnstaged !== " " &&
-                    statusStaged !== "?" && statusUnstaged !== "?") {
+                    statusStaged !== "?" && statusUnstaged !== "?" && !isUnmerged) {
                     needReset.push(file);
                     return;
                 }
 
-                var statusChar;
+                if (!isUnmerged) {
+                    var statusChar;
                 if (statusStaged !== " " && statusStaged !== "?") {
                     status.push(FILE_STATUS.STAGED);
                     statusChar = statusStaged;
-                } else {
-                    statusChar = statusUnstaged;
-                }
+                    } else {
+                        statusChar = statusUnstaged;
+                    }
 
-                switch (statusChar) {
-                    case " ":
-                        status.push(FILE_STATUS.UNMODIFIED);
-                        break;
-                    case "!":
-                        status.push(FILE_STATUS.IGNORED);
-                        break;
-                    case "?":
-                        status.push(FILE_STATUS.UNTRACKED);
-                        break;
-                    case "M":
-                        status.push(FILE_STATUS.MODIFIED);
-                        break;
-                    case "A":
-                        status.push(FILE_STATUS.ADDED);
-                        break;
-                    case "D":
-                        status.push(FILE_STATUS.DELETED);
-                        break;
-                    case "R":
-                        status.push(FILE_STATUS.RENAMED);
-                        break;
-                    case "C":
-                        status.push(FILE_STATUS.COPIED);
-                        break;
-                    case "U":
-                        status.push(FILE_STATUS.UNMERGED);
-                        break;
-                    default:
-                        throw new Error("Unexpected status: " + statusChar);
+                    switch (statusChar) {
+                        case " ":
+                            status.push(FILE_STATUS.UNMODIFIED);
+                            break;
+                        case "!":
+                            status.push(FILE_STATUS.IGNORED);
+                            break;
+                        case "?":
+                            status.push(FILE_STATUS.UNTRACKED);
+                            break;
+                        case "M":
+                            status.push(FILE_STATUS.MODIFIED);
+                            break;
+                        case "A":
+                            status.push(FILE_STATUS.ADDED);
+                            break;
+                        case "D":
+                            status.push(FILE_STATUS.DELETED);
+                            break;
+                        case "R":
+                            status.push(FILE_STATUS.RENAMED);
+                            break;
+                        case "C":
+                            status.push(FILE_STATUS.COPIED);
+                            break;
+                        default:
+                            throw new Error("Unexpected status: " + statusChar);
+                    }
+                } else {
+                    status.push(FILE_STATUS.UNMERGED);
                 }
 
                 var display = file,
@@ -733,7 +759,8 @@ define(function (require, exports) {
                     status: status,
                     display: display,
                     file: file,
-                    name: file.substring(file.lastIndexOf("/") + 1)
+                    name: file.substring(file.lastIndexOf("/") + 1),
+                    mergeConflicts: isUnmerged
                 });
             });
 
@@ -840,6 +867,33 @@ define(function (require, exports) {
                 timeout: false, // never timeout this
                 nonblocking: true // allow running other commands before this command finishes its work
             });
+        });
+    }
+
+    function mergetool(file) {
+        var args = ["mergetool"];
+        args.push("--no-prompt", file);
+        return git(args, {
+            timeout: false, // never timeout this
+            nonblocking: true // allow running other commands before this command finishes its work
+        });
+    }
+
+    function resolveUsingMine(file) {
+        var args = ["checkout", "--ours", "--", file];
+        return git(args).then(function () {
+            stage(file);
+            // stdout is empty so just return success
+            return true;
+        });
+    }
+
+    function resolveUsingTheirs(file) {
+        var args = ["checkout", "--theirs", "--", file];
+        return git(args).then(function () {
+            stage(file);
+            // stdout is empty so just return success
+            return true;
         });
     }
 
@@ -1091,6 +1145,9 @@ define(function (require, exports) {
     exports.diffFile                  = diffFile;
     exports.diffFileNice              = diffFileNice;
     exports.difftool                  = difftool;
+    exports.mergetool                 = mergetool;
+    exports.resolveUsingMine          = resolveUsingMine;
+    exports.resolveUsingTheirs        = resolveUsingTheirs;
     exports.clean                     = clean;
     exports.getFilesFromCommit        = getFilesFromCommit;
     exports.getDiffOfFileFromCommit   = getDiffOfFileFromCommit;
