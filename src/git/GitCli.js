@@ -705,13 +705,12 @@ define(function (require, exports) {
 
                 if (!isUnmerged) {
                     var statusChar;
-                if (statusStaged !== " " && statusStaged !== "?") {
-                    status.push(FILE_STATUS.STAGED);
-                    statusChar = statusStaged;
+                    if (statusStaged !== " " && statusStaged !== "?") {
+                        status.push(FILE_STATUS.STAGED);
+                        statusChar = statusStaged;
                     } else {
                         statusChar = statusUnstaged;
                     }
-
                     switch (statusChar) {
                         case " ":
                             status.push(FILE_STATUS.UNMODIFIED);

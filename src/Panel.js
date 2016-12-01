@@ -799,13 +799,13 @@ define(function (require, exports) {
                 file.mergeStatus = Strings["FILE_UNMERGED_" + file.mergeConflicts];
 
                 file.allowDiff = file.status.indexOf(Git.FILE_STATUS.UNTRACKED) === -1 &&
-                file.status.indexOf(Git.FILE_STATUS.RENAMED) === -1 &&
-                file.status.indexOf(Git.FILE_STATUS.DELETED) === -1 &&
-                file.status.indexOf(Git.FILE_STATUS.UNMERGED) === -1;
+                                 file.status.indexOf(Git.FILE_STATUS.RENAMED) === -1 &&
+                                 file.status.indexOf(Git.FILE_STATUS.DELETED) === -1 &&
+                                 file.status.indexOf(Git.FILE_STATUS.UNMERGED) === -1;
 
                 file.allowDelete = file.status.indexOf(Git.FILE_STATUS.UNTRACKED) !== -1 ||
-                file.status.indexOf(Git.FILE_STATUS.STAGED) !== -1 &&
-                file.status.indexOf(Git.FILE_STATUS.ADDED) !== -1;
+                                   file.status.indexOf(Git.FILE_STATUS.STAGED) !== -1 &&
+                                   file.status.indexOf(Git.FILE_STATUS.ADDED) !== -1;
 
                 file.allowUndo = !file.allowDelete;
                 file.allowResolve = file.status.indexOf(Git.FILE_STATUS.UNMERGED) !== -1;
