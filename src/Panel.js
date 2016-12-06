@@ -1282,10 +1282,12 @@ define(function (require, exports) {
 
 
         // create context menu for git resolve conflict
-        var resolveCmenu = Menus.registerContextMenu("git-panel-resolve-conflict-menu");
+        //var resolveCmenu = Menus.registerContextMenu("git-panel-resolve-conflict-menu");
+        var resolveCmenu =  Menus.getContextMenu("git-panel-context-menu");
         CommandManager.register(Strings.OPEN_IN_MERGETOOL, "git.openInMergetool", handleGitMergetool);
         CommandManager.register(Strings.RESOLVE_USING_OURS, "git.resolveUsingOurs", handleGitResolveUsingOurs);
         CommandManager.register(Strings.RESOLVE_USING_THEIRS, "git.resolveUsingTheirs", handleGitResolveUsingTheirs);
+        resolveCmenu.addMenuDivider();
         resolveCmenu.addMenuItem("git.openInMergetool");
         resolveCmenu.addMenuDivider();
         resolveCmenu.addMenuItem("git.resolveUsingOurs");
