@@ -984,7 +984,6 @@ define(function (require, exports) {
                 if (menuItem.isDivider) {
                     contextMenu.removeMenuDivider(target);
                 } else {
-                    console.log(menuItem._command._id);
                     contextMenu.removeMenuItem(menuItem._command._id);
                 }
             }
@@ -1349,16 +1348,7 @@ define(function (require, exports) {
 
             menuItems = _removeAllContextMenuItems(panelCmenu, menuItems);
 
-
             if (status == "UNMERGED") {
-                //                CommandManager.register(Strings.OPEN_IN_MERGETOOL, "git.openInMergetool", handleGitMergetool);
-                //                CommandManager.register(Strings.RESOLVE_USING_OURS, "git.resolveUsingOurs", handleGitResolveUsingOurs);
-                //                CommandManager.register(Strings.RESOLVE_USING_THEIRS, "git.resolveUsingTheirs", handleGitResolveUsingTheirs);
-                //                menuItems.push(panelCmenu.addMenuDivider().id);
-                //                menuItems.push(panelCmenu.addMenuItem("git.openInMergetool").id);
-                //                menuItems.push(panelCmenu.addMenuDivider());
-                //                menuItems.push(panelCmenu.addMenuItem("git.resolveUsingOurs").id);
-                //                menuItems.push(panelCmenu.addMenuItem("git.resolveUsingTheirs").id);
 
                 menuItems.push(_addContextMenuItem(panelCmenu, "", Menus.DIVIDER));
 
@@ -1369,13 +1359,6 @@ define(function (require, exports) {
                 menuItems.push(_addContextMenuItem(panelCmenu, Strings.RESOLVE_USING_OURS, "git.resolveUsingOurs", handleGitResolveUsingOurs));
 
                 menuItems.push(_addContextMenuItem(panelCmenu, Strings.RESOLVE_USING_THEIRS, "git.resolveUsingTheirs", handleGitResolveUsingTheirs));
-
-
-                console.log(menuItems);
-
-
-                //contextMenu.addMenuItem(RUN_BUILD + target, "", Menus.LAST);
-                //menuItems.push(RUN_BUILD + target);
             }
         });
 
