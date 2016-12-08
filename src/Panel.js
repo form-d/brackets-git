@@ -964,8 +964,7 @@ define(function (require, exports) {
             }
         }
         var newItem = contextMenu.addMenuItem(id);
-        console.log(newItem);
-        return newItem.id; // (name != "") ? id : newItem.id;
+        return newItem.id;
     }
 
     function undoLastLocalCommit() {
@@ -1285,13 +1284,15 @@ define(function (require, exports) {
         }
 
 
-        // create context menu for git resolve conflict
-        //var resolveCmenu = Menus.registerContextMenu("git-panel-resolve-conflict-menu");
+        // Add items to context menu for git resolve conflict
         var panelCmenu = Menus.getContextMenu("git-panel-context-menu"),
             menuItems = [];
+
         $(panelCmenu).on("beforeContextMenuOpen", function (evt) {
+
             var status = $gitPanel.find("tr.selected").attr("x-status");
             menuItems = _removeAllContextMenuItems(panelCmenu, menuItems);
+
             if (status == "UNMERGED") {
                 menuItems.push(_addContextMenuItem(panelCmenu, "", Menus.DIVIDER));
 
