@@ -809,6 +809,8 @@ define(function (require, exports) {
 
                 file.allowUndo = !file.allowDelete;
                 file.allowResolve = file.status.indexOf(Git.FILE_STATUS.UNMERGED) !== -1;
+                file.langId = " " + brackets.getLocale();
+
             });
             $tableContainer.append(Mustache.render(gitPanelResultsTemplate, {
                 files: files,
@@ -1222,7 +1224,7 @@ define(function (require, exports) {
                 e.stopPropagation();
                 handleGitTag($(e.target).closest("tr").attr("x-file"));
             })
-            .on("click", ".reset-all", discardAllChanges)
+            .on("click", ".reset-all", discardAllChanges);
 
         /* Put here event handlers for advanced actions
         if (Preferences.get("enableAdvancedFeatures")) {

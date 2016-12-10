@@ -7,7 +7,7 @@
                 {{#allowDiff}}<button class="btn btn-mini btn-git-diff" title="{{Strings.DIFF}}"><i class="octicon octicon-diff"></i></button>{{/allowDiff}}
                 {{#allowResolve}}<i class="inspection-errors" title="{{mergeStatus}}">&nbsp;&nbsp;</i>{{/allowResolve}}
             </td>
-            <td class="status-column">{{statusText}}</td>
+            <td class="status-column{{langId}}">{{statusText}}</td>
             <td>{{display}}</td>
             <td>
                 <div class="btn-group">
