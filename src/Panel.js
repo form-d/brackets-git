@@ -1049,8 +1049,7 @@ define(function (require, exports) {
             })
             .on("click", ".modified-file", function (e) {
                 var $this = $(e.currentTarget);
-            // check for selected class, so it does not trigger event to close all popups -> otherewise "git resolve dropdown" toggeling is prevented
-            if ($this.attr("x-status") === Git.FILE_STATUS.DELETED || $this.hasClass("selected")) {
+            if ($this.attr("x-status") === Git.FILE_STATUS.DELETED) {
                 return;
             }
             CommandManager.execute(Commands.FILE_OPEN, {
